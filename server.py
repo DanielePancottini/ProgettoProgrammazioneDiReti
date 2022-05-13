@@ -24,6 +24,9 @@ def saveFile(fileName, s):
         # update the progress bar
         print('write %d bytes into file' % len(dataRead))
         
+        #send file data ack to client
+        s.sendto('FILE SEGMENT ACK'.encode(), address)
+        
     f.close()
 
 while(True):

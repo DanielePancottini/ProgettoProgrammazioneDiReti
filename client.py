@@ -1,11 +1,12 @@
 
 import socket
+import time
 
 socketUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 serverAddress = ('localhost', 10000)
 command = 'put'
-filename = 'caro.txt'
+filename = 'grande.txt'
 
 try:
     
@@ -29,10 +30,14 @@ try:
         bytes_read = f.read(4096)
         if not bytes_read:
             # eof
+            print('eof')
             socketUDP.sendto('FILE END'.encode(), address)
             break
         
         socketUDP.sendto(bytes_read, address)
+        
+        #wait file segment ack before to continue sending
+        socketUDP.recvfrom(4096)
 
 except Exception as info:
     print(info)
