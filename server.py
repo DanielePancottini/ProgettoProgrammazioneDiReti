@@ -3,6 +3,8 @@ import socket
 import os
 import json
 
+import putHandler
+
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(('', 10000))
 
@@ -59,7 +61,7 @@ while(True):
         print('Starting get Data')
         
         #call function to handle file data flow
-        saveFile(fileName.decode(), s)
+        putHandler.saveFile(fileName.decode(), s)
         
         break
     else:
