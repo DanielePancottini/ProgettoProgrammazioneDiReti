@@ -23,7 +23,7 @@ try:
     #wait for filename ack
     ready, address = socketUDP.recvfrom(4096)
     
-    putHandler.sendFile(filename, socketUDP, serverAddress)
+    putHandler.rdtFileDataSender(filename, socketUDP, serverAddress)
 
 except Exception as info:
     print(info)

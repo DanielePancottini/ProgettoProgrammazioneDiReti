@@ -8,29 +8,6 @@ import putHandler
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(('', 10000))
 
-    
-def saveFile(fileName, s):
-    
-    # open file into write mode
-    f = open('./upload/' + fileName, "wb")
-    
-    while True:
-        # read 4096 bytes from the socket (file data)
-        dataRead, address = s.recvfrom(4096)
-        if dataRead.decode() == 'FILE END':    
-            # file transmission is done
-            print('File transmission is done');
-            break
-        # write to the file the bytes we just received
-        f.write(dataRead)
-        # update the progress bar
-        print('write %d bytes into file' % len(dataRead))
-        
-        #send file data ack to client
-        s.sendto('FILE SEGMENT ACK'.encode(), address)
-        
-    f.close()
-
 while(True):
     
     #get command from client
@@ -56,12 +33,14 @@ while(True):
         fileName, address = s.recvfrom(4096)
         print('Received filename')
         
+        #if file already exists, close connection
+        
         #send to client filename ack to receive file data
         s.sendto('FILENAME ACK'.encode(), address)
         print('Starting get Data')
         
         #call function to handle file data flow
-        putHandler.saveFile(fileName.decode(), s)
+        putHandler.rdtFileDataReceiver(fileName.decode(), s)
         
         break
     else:

@@ -2,28 +2,28 @@ import pickle
 import hashlib
 import sys
 import socket
+import os
+from enum import Enum
 
-class FileSegment :
+class PacketType(Enum):
+    DATA_PACKET = 1
+    ACK_PACKET = 2
+
+class Packet:
     def __init__(self, packetType, sequenceNumber, data, checksum):
         self.packetType = packetType
         self.sequenceNumber = sequenceNumber
         self.data = data
         self.checksum = checksum
         
-        
-def saveFile(fileName, serverSocket):
-    
-    #packet type constant, value 2 means that packets sent by the client will be ack packets
-    
-    packetType = 2
+def rdtFileDataReceiver(fileName, serverSocket):
     
     #variable to trace packet sequence number to receive
     sequenceNumberToReceive = 1
     
     #buffer bytes to read
-    BUFFER_SIZE = sys.getsizeof(FileSegment)
+    BUFFER_SIZE = sys.getsizeof(Packet)
     
-    # open file into write mode
     f = open('./upload/' + fileName, "wb")
     
     while True:
@@ -40,22 +40,21 @@ def saveFile(fileName, serverSocket):
         except socket.error as emsg:
             print("Socket recv error: ", emsg)
             
-        print("rdt_recv: Received a message of size %d" % len(rawPacket))
+        print("File Data Receiver: Received a message of size %d" % len(rawPacket))
         
         serverSocket.settimeout(None)
         
-        #convert raw packet into FileSegment object
+        #convert raw packet into Packet object
         packet = pickle.loads(rawPacket)
         
         #checksum controll
-        if hashlib.md5(rawPacket).hexdigest() == packet.checksum: # check for checksum
-            print("rdt_rcv: Recieved a corrupted packet: Type = DATA, Length = %d" % len(rawPacket))
-            print("rdt_rcv: Drop the packet")
+        if hashlib.md5(rawPacket).hexdigest() == packet.checksum:
+            print("File Data Receiver: Recieved a corrupted packet: Type = DATA, Length = %d" % len(rawPacket))
             
             #not send ack, so will receive the same packet
             continue
-        if packet.packetType == 1:
-            print("rdt_rcv: Got an expected Packet")
+        if packet.packetType == PacketType.DATA_PACKET:
+            print("File Data Receiver: Got an expected Packet")
             if packet.sequenceNumber == sequenceNumberToReceive:
                 
                 #write packet data to file
@@ -64,7 +63,7 @@ def saveFile(fileName, serverSocket):
                 
                 #prepare ack packet
                 
-                ack = FileSegment(packetType, packet.sequenceNumber, '', 0)
+                ack = Packet(PacketType.ACK_PACKET, packet.sequenceNumber, '', 0)
                 
                 #calculate checksum
                 ack.checksum = hashlib.md5(pickle.dumps(ack)).hexdigest()
@@ -82,7 +81,7 @@ def saveFile(fileName, serverSocket):
                 #if received packet already received, send ack to client, 
                 # maybe ack loss happened
                 
-                ack = FileSegment(packetType, packet.sequenceNumber, '', 0)
+                ack = Packet(PacketType.ACK_PACKET, packet.sequenceNumber, '', 0)
                 
                 #calculate checksum
                 ack.checksum = hashlib.md5(pickle.dumps(ack)).hexdigest()
@@ -95,16 +94,13 @@ def saveFile(fileName, serverSocket):
         else:
             continue # if ack recieved in the first place then ignore
     
-def sendFile(fileName, clientSocket, serverAddress):
-    
-    #set packet type to constant, 1 means that the packet contains file segment 
-    packetType = 1
-    
+def rdtFileDataSender(fileName, clientSocket, serverAddress):
+   
     #variable to trace packet sequence number to send
     sequenceNumberToSend = 1
     
     #buffer bytes to read
-    BUFFER_SIZE = sys.getsizeof(FileSegment)
+    BUFFER_SIZE = sys.getsizeof(Packet)
     
     ACK_TIMEOUT = 0.05
    
@@ -117,11 +113,11 @@ def sendFile(fileName, clientSocket, serverAddress):
     while True:
         
         #prepare packet to send
-        packet = FileSegment(packetType, sequenceNumberToSend, fileData, 0)
+        packet = Packet(PacketType.DATA_PACKET, sequenceNumberToSend, fileData, 0)
         
         if not fileData:
             # eof, close socket
-            print('eof, closing socket')
+            print('Eof Reached, closing socket')
             f.close()
             clientSocket.close()
         
@@ -142,7 +138,7 @@ def sendFile(fileName, clientSocket, serverAddress):
             #wait ack for packet just sent
             rawAck, serverAddress = clientSocket.recvfrom(BUFFER_SIZE)
         except socket.timeout:
-            print("rdt_send: Timeout!! Retransmit the packet %d again" % sequenceNumberToSend) 
+            print("File Data Sender: Timeout!! Retransmit the packet %d again" % sequenceNumberToSend) 
             continue
         except socket.error as emsg:
             print("Socket recv error: ", emsg)
@@ -153,13 +149,13 @@ def sendFile(fileName, clientSocket, serverAddress):
         ack = pickle.loads(rawAck)
         
         #checksum controll
-        if hashlib.md5(rawAck).hexdigest() == ack.checksum: # calculate the checksum
-           print("rdt_send: Recieved a corrupted packet: Type = DATA, Length = %d" % len(rawAck))
+        if hashlib.md5(rawAck).hexdigest() == ack.checksum:
+           print("File Data Sender: Recieved a corrupted packet: Type = DATA, Length = %d" % len(rawAck))
            continue
         
         #checks if packet received is really an ack
-        if ack.packetType == 2:
-            print("rdt_send: Recieved the expected ACK")
+        if ack.packetType == PacketType.ACK_PACKET:
+            print("File Data Sender: Recieved the expected ACK")
             if ack.sequenceNumber == sequenceNumberToSend:
                 #expected ack received, increment sequence number to send
                 #and read next file segment
