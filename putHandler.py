@@ -1,8 +1,6 @@
 import pickle
 import hashlib
-import sys
 import socket
-import os
 from enum import Enum
 
 class PacketType(Enum):
@@ -22,7 +20,7 @@ def rdtFileDataReceiver(fileName, serverSocket):
     sequenceNumberToReceive = 1
     
     #buffer bytes to read
-    BUFFER_SIZE = sys.getsizeof(Packet)
+    BUFFER_SIZE = 8192
     
     f = open('./upload/' + fileName, "wb")
     
@@ -39,6 +37,7 @@ def rdtFileDataReceiver(fileName, serverSocket):
             return 1
         except socket.error as emsg:
             print("Socket recv error: ", emsg)
+            return -1
             
         print("File Data Receiver: Received a message of size %d" % len(rawPacket))
         
@@ -100,7 +99,9 @@ def rdtFileDataSender(fileName, clientSocket, serverAddress):
     sequenceNumberToSend = 1
     
     #buffer bytes to read
-    BUFFER_SIZE = sys.getsizeof(Packet)
+    BUFFER_SIZE = 8192
+    
+    FILE_READ_BYTES = 4096
     
     ACK_TIMEOUT = 0.05
    
@@ -108,7 +109,7 @@ def rdtFileDataSender(fileName, clientSocket, serverAddress):
     f = open(fileName, "rb") 
    
     #first file segment to send
-    fileData = f.read(BUFFER_SIZE)
+    fileData = f.read(FILE_READ_BYTES)
    
     while True:
         
@@ -160,7 +161,7 @@ def rdtFileDataSender(fileName, clientSocket, serverAddress):
                 #expected ack received, increment sequence number to send
                 #and read next file segment
                 ++sequenceNumberToSend
-                fileData = f.read(BUFFER_SIZE)
+                fileData = f.read(FILE_READ_BYTES)
             else:
                 #not expected ack received, retransmit the packet
                 continue
