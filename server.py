@@ -3,11 +3,12 @@ import socket
 import os
 import json
 
-import putHandler
-import threading
+import rdt_handler
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(('', 10000))
+
+putHandler = rdt_handler.RdtFileTransferHandler();
 
 while(True):
     

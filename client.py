@@ -3,9 +3,10 @@ import socket
 import json
 import os
 
-import putHandler
+import rdt_handler
 
 socketUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+putHandler = rdt_handler.RdtFileTransferHandler();
 
 serverAddress = ('localhost', 10000)
 
