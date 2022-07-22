@@ -1,7 +1,5 @@
 
 import socket
-import json
-import os
 
 import rdt_handler
 
@@ -10,34 +8,14 @@ putHandler = rdt_handler.RdtFileTransferHandler();
 
 serverAddress = ('localhost', 10000)
 
-payload = {
-    "command": "put",
-    "fileName": "grandeFile.txt"
-}
-
 try:
     
-    if(not os.path.exists(payload['fileName'])):
-        print('File not exists')
-        socketUDP.close()
+   socketUDP.sendto('put PROVA.txt'.encode(), serverAddress);
     
-    print('sending put command')
-    socketUDP.sendto(json.dumps(payload).encode(), serverAddress)
+   data, address = socketUDP.recvfrom(4096);
+   
+   putHandler.rdtFileDataSender('PROVA.txt', socketUDP, serverAddress);
     
-    #wait for command ack
-    
-    socketUDP.settimeout(0.5)
-    
-    try:    
-        ready, address = socketUDP.recvfrom(4096)
-    except socket.timeout:
-        print("Error during command transmission, closing socket")   
-        socketUDP.close()
-    
-    socketUDP.settimeout(None)
-    
-    putHandler.rdtFileDataSender(payload['fileName'], socketUDP, serverAddress)
-
 except Exception as info:
     print(info)
 finally: 

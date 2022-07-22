@@ -16,7 +16,7 @@ class Packet:
     
 class RdtFileTransferHandler:
         
-    def rdtFileDataReceiver(self, fileName, serverSocket):
+    def rdtFileDataReceiver(self, filePath, serverSocket):
         
         #variable to trace packet sequence number to receive
         sequenceNumberToReceive = 1
@@ -24,7 +24,7 @@ class RdtFileTransferHandler:
         #buffer bytes to read
         BUFFER_SIZE = 8192
         
-        f = open('./upload/' + fileName, "wb")
+        f = open(filePath, "wb")
         
         while True:
             
@@ -95,7 +95,7 @@ class RdtFileTransferHandler:
             else:
                 continue # if ack recieved in the first place then ignore
         
-    def rdtFileDataSender(self, fileName, clientSocket, serverAddress):
+    def rdtFileDataSender(self, filePath, clientSocket, serverAddress):
        
         #variable to trace packet sequence number to send
         sequenceNumberToSend = 1
@@ -108,7 +108,7 @@ class RdtFileTransferHandler:
         ACK_TIMEOUT = 0.05
        
         #open file into read mode
-        f = open(fileName, "rb") 
+        f = open(filePath, "rb") 
        
         #first file segment to send
         fileData = f.read(FILE_READ_BYTES)
