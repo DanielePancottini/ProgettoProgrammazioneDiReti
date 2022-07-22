@@ -11,11 +11,7 @@ serverAddress = ('localhost', 10000)
 
 initialMessage="ready"
 uploadPath = os.getcwd()+"\\Upload\\"
-
-payload = {
-    "command": "put",
-    "fileName": "grandeFile.txt"
-}
+downloadPath = os.getcwd()+"\\Download\\"
 
 choice=-1
 def menu():
@@ -48,9 +44,15 @@ try:
             files = os.listdir(uploadPath)
             print(files)
         elif(choice == 2):
-            print("Operazione --alfa--")
+            #TODO controllo risposta del server 
+            name=input("Insert file name to put: ")
+            fileName = uploadPath + name
+            putHandler.rdtFileDataSender(fileName, socketUDP, serverAddress)
         elif(choice == 3):
-            print("Operazione --beta--")
+            #TODO controllo risposta del server
+            name=input("Insert file name to get: ")
+            fileName = downloadPath + name
+            putHandler.rdtFileDataReceiver(fileName, socketUDP)
         elif(choice == 4): 
             print("exit...")
             break
@@ -61,23 +63,6 @@ try:
     #     print('File not exists')
     #     socketUDP.close()
     
-    # print('sending put command')
-    # socketUDP.sendto(json.dumps(payload).encode(), serverAddress)
-    
-    # #wait for command ack
-    
-    # socketUDP.settimeout(0.5)
-    
-    # try:    
-    #     ready, address = socketUDP.recvfrom(4096)
-    # except socket.timeout:
-    #     print("Error during command transmission, closing socket")   
-    #     socketUDP.close()
-    
-    # socketUDP.settimeout(None)
-    
-    # putHandler.rdtFileDataSender(payload['fileName'], socketUDP, serverAddress)
-
 except Exception as info:
     print(info)
 finally: 
