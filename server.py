@@ -1,46 +1,49 @@
 
 import socket
 import os
-import json
 
 import rdt_handler
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.bind(('', 10000))
 
-putHandler = rdt_handler.RdtFileTransferHandler();
+rdtHandler = rdt_handler.RdtFileTransferHandler()
+filesPath = './upload'
 
-while(True):
-    
-    #get command from client
-    rawCommandPacket, address = s.recvfrom(4096)
-    print('received message from %s %s' % (rawCommandPacket, address))
-    
-    commandPacket = json.loads(rawCommandPacket)
-    
-    command = commandPacket['command']
-    
-    #command switch for list, get, put
-    
-    if command == 'list':
-        #send to client files list as json response
-        files = json.dumps(os.listdir('./upload'))
-        s.sendto(files.encode(), address)
-    elif command == 'get':
-        pass
-    elif command == 'put':
-        #send to client ready message to receive filename to upload
-        print('Read Put')
+try: 
         
-        fileName = commandPacket['fileName']
+    while(True):
         
-        #send to client filename ack to receive file data
-        s.sendto('FILENAME ACK'.encode(), address)
-        print('Starting get Data')
+        #get command from client
+        rawCommandPacket, address = s.recvfrom(4096)
+        print('Received Command: %s | From: %s' % (rawCommandPacket, address))
         
-        #call function to handle file data flow
-        putHandler.rdtFileDataReceiver(fileName, s)
+        #split command by other params
+        commandPacket = rawCommandPacket.decode().split()
+        command = commandPacket[0]
         
-        break
-    else:
-        break
+        #command switch for list, get, put
+        if command.lower() == 'list':
+            #send to client files list as array of strings
+            files = str(os.listdir(filesPath))
+            s.sendto(files.encode(), address)
+            
+        elif command.lower() == 'get':
+            #check if file exists, if not send error, otherwise start rdt file transmission for get
+            filename = commandPacket[1]
+            if(os.path.exists(filesPath + '/' + filename) == False):
+                s.sendto('ERROR FILENAME'.encode(), address)
+                continue
+            else:
+                s.sendto('ACK GET'.encode(), address)
+                rdtHandler.rdtFileDataSender(filesPath + '/' + filename, s, address)
+        
+        elif command.lower() == 'put':
+            #send command ack and start rdt file transmission for put
+            filename = commandPacket[1]
+            s.sendto('PUT ACK'.encode(), address)
+            
+            rdtHandler.rdtFileDataReceiver(filesPath + '/' + filename, s)
+
+except Exception as error:
+    print(error)
