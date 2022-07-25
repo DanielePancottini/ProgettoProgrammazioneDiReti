@@ -41,27 +41,29 @@ try:
         
         if(choice == 1):
             #Print file list
-            files = os.listdir(uploadPath)
+            socketUDP.sendto(list.encode(), serverAddress)
+            files = socketUDP.recvfrom(4096)
             print(files)
         elif(choice == 2):
-            #TODO controllo risposta del server 
             name=input("Insert file name to put: ")
             fileName = uploadPath + name
+            socketUDP.sendto(('put '+ fileName).encode(), serverAddress)
+            ok = socketUDP.recvfrom(4096)
             putHandler.rdtFileDataSender(fileName, socketUDP, serverAddress)
         elif(choice == 3):
-            #TODO controllo risposta del server
             name=input("Insert file name to get: ")
             fileName = downloadPath + name
+            socketUDP.sendto(('get '+ fileName).encode(), serverAddress)
+            ok = socketUDP.recvfrom(4096)
+            if(ok == 'ERROR FILENAME'):
+                print("File name doesn't exist")
+                socketUDP.close()
             putHandler.rdtFileDataReceiver(fileName, socketUDP)
         elif(choice == 4): 
             print("exit...")
             break
         else:
             print("Wrong choice")
-    
-    # if(not os.path.exists(payload['fileName'])):
-    #     print('File not exists')
-    #     socketUDP.close()
     
 except Exception as info:
     print(info)
