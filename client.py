@@ -31,25 +31,32 @@ try:
         choice=input("Choose[1..4]: ")
         
         if(choice == '1'):
-            #Print file list
+            #Send to server command for receive file's list
             socketUDP.sendto('list'.encode(), serverAddress)
+            #receive files
             files, address = socketUDP.recvfrom(4096)
             print(files)
         elif(choice == '2'):
             name=input("Insert file name to put: ")
             fileName = uploadPath + name
+            #Send to server command for put file
             socketUDP.sendto(('put '+ name).encode(), serverAddress)
+            #Wait answer of server
             ok, address = socketUDP.recvfrom(4096)
-            putHandler.rdtFileDataSender(fileName, socketUDP, serverAddress)
+            #Using rdt handler to manage packets
+            rdt_handler.rdtFileDataSender(fileName, socketUDP, serverAddress)
         elif(choice == '3'):
             name=input("Insert file name to get: ")
             fileName = downloadPath + name
+            #Send to server command for get file
             socketUDP.sendto(('get '+ name).encode(), serverAddress)
             ok, address = socketUDP.recvfrom(4096)
+            #check file
             if(ok == 'ERROR FILENAME'):
                 print("File name doesn't exist")
                 socketUDP.close()
-            putHandler.rdtFileDataReceiver(fileName, socketUDP)
+            #Using rdt handler to manage packets
+            rdt_handler.rdtFileDataReceiver(fileName, socketUDP)
         elif(choice == '4'): 
             print("exit...")
             break
