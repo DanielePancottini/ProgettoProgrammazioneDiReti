@@ -36,6 +36,7 @@ class RdtFileTransferHandler:
             except socket.timeout:
                 print('File transmission completed')
                 f.close()
+                serverSocket.settimeout(None)
                 return 1
             except socket.error as emsg:
                 print("Socket recv error: ", emsg)
@@ -48,8 +49,12 @@ class RdtFileTransferHandler:
             #convert raw packet into Packet object
             packet = pickle.loads(rawPacket)
             
-            #checksum controll
-            if hashlib.md5(rawPacket).hexdigest() == packet.checksum:
+            #preparing packet to checksum control
+            receivedChecksum = packet.checksum
+            packet.checksum = 0
+            
+            #checksum control
+            if hashlib.md5(pickle.dumps(packet)).hexdigest() != receivedChecksum:
                 print("File Data Receiver: Recieved a corrupted packet: Type = DATA, Length = %d" % len(rawPacket))
                 
                 #not send ack, so will receive the same packet
@@ -70,7 +75,7 @@ class RdtFileTransferHandler:
                     ack.checksum = hashlib.md5(pickle.dumps(ack)).hexdigest()
                     
                     try:
-                        #send ack fr just received packet
+                        #send ack for just received packet
                         serverSocket.sendto(pickle.dumps(ack), clientAddress)
                     except socket.error as emsg:
                         print("Socket send error: ", emsg)
@@ -93,7 +98,7 @@ class RdtFileTransferHandler:
                         print("Socket send error: ", emsg)
                         return -1
             else:
-                continue # if ack recieved in the first place then ignore
+                continue # if ack received in the first place then ignore
         
     def rdtFileDataSender(self, filePath, clientSocket, serverAddress):
        
@@ -120,9 +125,9 @@ class RdtFileTransferHandler:
             
             if not fileData:
                 # eof, close socket
-                print('Eof Reached, closing socket')
+                print('Eof Reached, closing transmission')
                 f.close()
-                clientSocket.close()
+                return 1
             
             #calculate checksum 
             packet.checksum = hashlib.md5(pickle.dumps(packet)).hexdigest()
@@ -148,11 +153,15 @@ class RdtFileTransferHandler:
                 
             clientSocket.settimeout(None) #end timer
             
-            #convert raw ack packet into FileSegment object
+            #convert raw ack packet into Packet object
             ack = pickle.loads(rawAck)
             
-            #checksum controll
-            if hashlib.md5(rawAck).hexdigest() == ack.checksum:
+            #preparing packet to checksum control
+            receivedChecksum = ack.checksum
+            ack.checksum = 0
+            
+            #checksum control
+            if hashlib.md5(pickle.dumps(ack)).hexdigest() != receivedChecksum:
                print("File Data Sender: Recieved a corrupted packet: Type = DATA, Length = %d" % len(rawAck))
                continue
             
