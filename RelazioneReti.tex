@@ -18,7 +18,6 @@
 
 \newpage
 \section{Analisi del Problema}
-TORNO SUBITO
 \subsection{Descrizione}
 
 \newpage
@@ -29,6 +28,15 @@ TORNO SUBITO
 \newpage
 \section{Sviluppo}
 \subsection{Client}
+La classe Client definisce il socket UDP per la comunicazione con il server.
+Tramite un menù di scelta vengono inviati i comandi al server (con il comando  \textit{sendto}) che li gestirà e restituirà il risultato al client.
+Ricevuto il risultato dal server (tramite il comando \textit{recvfrom}) eseguirà a seconda del comando inviato:
+\begin{itemize}
+    \item \textbf{List} stamperà il nome dei files ricevuti dal server.
+    \item \textbf{Put} userà la funzione rdt per la gestione dei pacchetti.
+    \item \textbf{Get} controllerà l'effettiva esistenza del file e successivamente userà la funzione rdt per la gestione dei pacchetti.
+\end{itemize}
+
 \subsection{Server}
 \subsection{RDT Handler}
 
