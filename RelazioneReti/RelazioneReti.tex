@@ -45,6 +45,12 @@ Il client potrà caricare un determinato file sul server attraverso il comando \
 \subsection{Protocollo}
 
 %%% Protocollo %%%
+Il client e il server comunicano tramite specifici comandi inviati dal client al momento della selezione relativa all'opzione desiderata (visulizzata nel menù), nello specifico i comandi inviati sono:
+\begin{itemize}
+    \item \textbf{list}: richiesta della lista dei file disponibili
+    \item \textbf{put + \textit{'nome file'}}: upload di un file sul server
+    \item \textbf{get + \textit{'nome file'}}: download di un file
+\end{itemize}
 
 \ \\
 
@@ -95,9 +101,9 @@ La classe Client definisce il socket UDP per la comunicazione con il server.
 Tramite un menù di scelta vengono inviati i comandi al server (con il comando  \textit{sendto}) che li gestirà e restituirà il risultato al client.
 Ricevuto il risultato dal server (tramite il comando \textit{recvfrom}) eseguirà a seconda del comando inviato:
 \begin{itemize}
-    \item \textbf{List} stamperà il nome dei files ricevuti dal server.
-    \item \textbf{Put} userà la funzione rdt per la gestione dei pacchetti.
-    \item \textbf{Get} controllerà l'effettiva esistenza del file e successivamente userà la funzione rdt per la gestione dei pacchetti.
+    \item \textbf{List} stampa nome dei files ricevuti dal server.
+    \item \textbf{Put} utilizzo della funzione rdt per la gestione dei pacchetti.
+    \item \textbf{Get} controllo l'effettiva esistenza del file e successivamente utilizzo della funzione rdt per la gestione dei pacchetti.
 \end{itemize}
 
 \subsection{Server}
