@@ -1,6 +1,7 @@
 
 import socket
 import os
+import pickle
 
 import rdt_handler
 
@@ -31,8 +32,8 @@ try:
         #command switch for list, get, put
         if command.lower() == 'list':
             # send to client files list as array of strings
-            files = str(os.listdir(filesPath))
-            s.sendto(files.encode(), address)
+            files = os.listdir(filesPath)
+            s.sendto(pickle.dumps(files), address)
             
         elif command.lower() == 'get':
             # check if file exists, if not send error, otherwise start rdt file transmission for get

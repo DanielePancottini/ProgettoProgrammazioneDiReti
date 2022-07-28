@@ -1,11 +1,12 @@
 
 import socket
 import os
+import pickle
 
 import rdt_handler
 
 socketUDP = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-putHandler = rdt_handler.RdtFileTransferHandler();
+rdtHandler = rdt_handler.RdtFileTransferHandler();
 
 serverAddress = ('localhost', 10000)
 
@@ -35,7 +36,10 @@ try:
             socketUDP.sendto('list'.encode(), serverAddress)
             #receive files
             files, address = socketUDP.recvfrom(4096)
-            print(files)
+            files = pickle.loads(files)
+            for file in files:
+                print(file)
+            
         elif(choice == '2'):
             name=input("Insert file name to put: ")
             fileName = uploadPath + name
@@ -44,7 +48,7 @@ try:
             #Wait answer of server
             ok, address = socketUDP.recvfrom(4096)
             #Using rdt handler to manage packets
-            rdt_handler.rdtFileDataSender(fileName, socketUDP, serverAddress)
+            rdtHandler.rdtFileDataSender(fileName, socketUDP, serverAddress)
         elif(choice == '3'):
             name=input("Insert file name to get: ")
             fileName = downloadPath + name
@@ -56,7 +60,7 @@ try:
                 print("File name doesn't exist")
                 socketUDP.close()
             #Using rdt handler to manage packets
-            rdt_handler.rdtFileDataReceiver(fileName, socketUDP)
+            rdtHandler.rdtFileDataReceiver(fileName, socketUDP)
         elif(choice == '4'): 
             print("exit...")
             break
