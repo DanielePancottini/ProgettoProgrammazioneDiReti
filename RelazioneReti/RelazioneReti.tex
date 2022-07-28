@@ -41,12 +41,12 @@ Il client potrà caricare un determinato file sul server attraverso il comando \
 %%% Design %%%
 \ \\
 Il software è basato su un'architettura client-server, analizzando il problema abbiamo deciso di far gestire al server un client alla volta.
-Per quanto riguarda la gestione dei pacchetti abbiamo deciso di utilizzarla solo per i comandi che implicano la trasmissione di file (\textbf{PUT e GET}), e non per il comando list, in quanto la perdita dei pacchetti non risulterebbe un problema che ne impedirebbe le funzionalità.
-Per la gestione dei pacchetti abbiamo implementanto rdt 3.0 che permette di risolvere i problemi dell'udp in maniera efficace.
+Per quanto riguarda la gestione degli errori nella trasmissione (utilizzando UDP) abbiamo deciso di utilizzarla solo per i comandi che implicano la trasmissione di file (\textbf{PUT e GET}), e non per il comando list, in quanto la perdita dei pacchetti non risulterebbe un problema che ne impedirebbe le funzionalità.
+Per la gestione delle trasmissioni 'affidabili' abbiamo implementato un sistema basato sul protocollo RDT 3.0 che permette di risolvere i problemi dell'udp in maniera efficace.
 
 \begin{figure}[!htb]
   \includegraphics[width=\linewidth]{rdtFigure.png}
-  \caption{Schema funzionalità rdt}
+  \caption{Schema funzionalità RDT 3.0}
 \end{figure}
 
 \subsection{Protocollo}
@@ -104,7 +104,7 @@ ed attende l'inizio della trasmissione del file da parte del client, sempre util
 
 %%% Sviluppo Client %%%
 
-La classe Client definisce il socket UDP per la comunicazione con il server.
+Il modulo \textbf{\emph{client.py}} definisce il socket UDP per la comunicazione con il server.
 Tramite un menù di scelta vengono inviati i comandi al server (con il comando  \textit{sendto}) che li gestirà e restituirà il risultato al client.
 Ricevuto il risultato dal server (tramite il comando \textit{recvfrom}) eseguirà a seconda del comando inviato:
 \begin{itemize}
