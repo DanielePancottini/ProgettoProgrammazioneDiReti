@@ -6,7 +6,7 @@
 \renewcommand{\contentsname}{Indice}
 
 \title{Applicazione Client-Server UDP per Trasferimento File}
-\author{Marco Costantini - marco.costantini3@studio.unibo.it \and Daniele Pancottini - daniele.pancottini@studio.unibo.it}
+\author{Marco Costantini - marco.costantini7@studio.unibo.it \and Daniele Pancottini - daniele.pancottini@studio.unibo.it}
 \date{27 Luglio 2022}
 
 \begin{document}
@@ -138,6 +138,10 @@ La classe \textbf{\emph{RdtFileTransferHandler}} espone i seguenti metodi:
 \newpage
 \section{Guida Utente}
 \subsection{Client}
+Avviato il client comparirà su schermo un menù con le opzioni possibili dei vari comandi.
+\subsubsection{Comando List}Per effettuare il comando list basterà selezionare l'apposita opzione dal menù (1), verranno visualizzati i file all'interno della cartella \textit{'upload'}.
+\subsubsection{Comando Put}Per effettuare il comando put basterà selezionare l'apposita opzione dal menù (2), verrà chiesto all'utente il nome del file da inserire nella cartella upload, il file dovrà essere presente nella cartella \textit{'ToUpload'} per essere caricato correttamente.
+\subsubsection{Comando Get}Per effettuare il comando put basterà selezionare l'apposita opzione dal menù (3), verrà chiesto all'utente il nome del file da scaricare, il file selezionato, in caso sia presente nella cartella 'upload', verrà scaricato nella cartella \textit{'Download'}.
 \subsection{Server}
 
 %%% Guida Utente Server %%%
