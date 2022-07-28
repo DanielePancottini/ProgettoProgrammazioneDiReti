@@ -38,11 +38,16 @@ Il client potrà caricare un determinato file sul server attraverso il comando \
 
 \newpage
 \section{Design}
+%%% Design %%%
+\ \\
 Il software è basato su un'architettura client-server, analizzando il problema abbiamo deciso di far gestire al server un client alla volta.
 Per quanto riguarda la gestione dei pacchetti abbiamo deciso di utilizzarla solo per i comandi che implicano la trasmissione di file (\textbf{PUT e GET}), e non per il comando list, in quanto la perdita dei pacchetti non risulterebbe un problema che ne impedirebbe le funzionalità.
 Per la gestione dei pacchetti abbiamo implementanto rdt 3.0 che permette di risolvere i problemi dell'udp in maniera efficace.
-%%% Design %%%
-\ \\
+
+\begin{figure}[!htb]
+  \includegraphics[width=\linewidth]{rdtFigure.png}
+  \caption{Schema funzionalità rdt}
+\end{figure}
 
 \subsection{Protocollo}
 
@@ -140,7 +145,7 @@ La classe \textbf{\emph{RdtFileTransferHandler}} espone i seguenti metodi:
 \newpage
 \section{Guida Utente}
 \subsection{Client}
-Avviato il client comparirà su schermo un menù con le opzioni possibili dei vari comandi.
+Avviato il client (\textit{python3 client.py}) comparirà su schermo un menù con le opzioni possibili dei vari comandi.
 \subsubsection{Comando List}Per effettuare il comando list basterà selezionare l'apposita opzione dal menù (1), verranno visualizzati i file all'interno della cartella \textit{'upload'}.
 \subsubsection{Comando Put}Per effettuare il comando put basterà selezionare l'apposita opzione dal menù (2), verrà chiesto all'utente il nome del file da inserire nella cartella upload, il file dovrà essere presente nella cartella \textit{'ToUpload'} per essere caricato correttamente.
 \subsubsection{Comando Get}Per effettuare il comando put basterà selezionare l'apposita opzione dal menù (3), verrà chiesto all'utente il nome del file da scaricare, il file selezionato, in caso sia presente nella cartella 'upload', verrà scaricato nella cartella \textit{'Download'}.
