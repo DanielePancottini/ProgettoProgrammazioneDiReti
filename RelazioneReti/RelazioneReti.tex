@@ -38,7 +38,9 @@ Il client potrà caricare un determinato file sul server attraverso il comando \
 
 \newpage
 \section{Design}
-
+Il software è basato su un'architettura client-server, analizzando il problema abbiamo deciso di far gestire al server un client alla volta.
+Per quanto riguarda la gestione dei pacchetti abbiamo deciso di utilizzarla solo per i comandi che implicano la trasmissione di file (\textbf{PUT e GET}), e non per il comando list, in quanto la perdita dei pacchetti non risulterebbe un problema che ne impedirebbe le funzionalità.
+Per la gestione dei pacchetti abbiamo implementanto rdt 3.0 che permette di risolvere i problemi dell'udp in maniera efficace.
 %%% Design %%%
 \ \\
 
